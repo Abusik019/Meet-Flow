@@ -115,7 +115,8 @@ const UserSchema = new mongoose.Schema({
             validator: function(v) {
                 return validator.isURL(v, {
                     protocols: ['http', 'https'],
-                    require_protocol: true
+                    require_protocol: true,
+                    require_tld: false,
                 })
             },
             message: '{VALUE} is not a valid url with http or https protocols'

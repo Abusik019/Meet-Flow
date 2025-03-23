@@ -30,7 +30,7 @@ exports.register = async (req, res) => {
 
         try {
             const { username, firstName, lastName, email, password } = req.body;
-            const image = req.file ? req.file.buffer.toString('base64') : null; // Пример хранения в базе (можно заменить на путь к файлу)
+            const image = req.file ? req.file.buffer.toString('base64') : 'http://localhost:9090/cache/images/default.logo.svg';
 
             const verificationToken = crypto.randomBytes(32).toString('hex');
 
