@@ -1,11 +1,13 @@
-import './App.css'
+import { Route, Routes } from "react-router-dom";
+import "./App.css";
+import Authorization from "./pages/Auth";
 
 function App() {
-  return (
-    <>
-      <h2 className='font-medium text-2xl text-[red]'>Lorem ipsum dolor sit amet consectetur adipisicing elit. At inventore iusto laboriosam commodi aliquid iste corporis deleniti! Laudantium at id corrupti, alias ratione facere vitae voluptatibus nisi dolorum est aut!</h2>
-    </>
-  )
+    return <>
+        <Routes>
+            <Route path="/auth" element={<Authorization />}/>
+        </Routes>
+    </>;
 }
 
-export default App
+export default App;

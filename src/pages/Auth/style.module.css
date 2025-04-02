@@ -1,0 +1,26 @@
+.username, .password{
+    width: 100%;
+
+    border-radius: 8px;
+
+    border: 1px solid #eaeaea;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px 0px rgb(0 0 0 / 0.1);
+
+    padding: 12px 16px 12px 50px;
+    box-sizing: border-box;
+
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position: 16px;
+
+    outline: none;
+    appearance: none;
+}
+
+.username{
+    background-image: url('../../assets/icons/message.svg');
+}
+
+.password{
+    background-image: url('../../assets/icons/lock.svg');
+}
