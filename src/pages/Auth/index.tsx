@@ -1,22 +1,54 @@
 import styles from './style.module.css';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from 'react';
+import { signIn } from '../../store/slices/authSlice';
+import { RootState, useAppDispatch } from '../../store/store';
+import { useSelector } from 'react-redux';
 import classnames from 'classnames';
+import Registration from '../../components/layouts/registration';
 
 import meetImg from "../../assets/images/login.jpg";
 import logoImg from "../../assets/images/logo.png";
 import yandexImg from "../../assets/icons/yandex.png";
 import googleImg from "../../assets/icons/google.svg";
-import Registration from '../../components/layouts/registration';
 
 type Props = {};
 
 export default function Authorization({}: Props) {
-    const   [email, setEmail] = useState<string | null>(''), 
-            [password, setPassword] = useState<string | null>(''),
-            [isLoginPage, setIsLoginPage] = useState<boolean>(false);
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const error = useSelector((state: RootState) => state.authSlice.error);
 
-    const isDisabled = Boolean(email && password);
+    const   [username, setUsername] = useState<string>(''), 
+            [password, setPassword] = useState<string>(''),
+            [isLoginPage, setIsLoginPage] = useState<boolean>(true),
+            [isLoading, setIsLoading] = useState(false);
+
+    const isDisabled = Boolean(username && password);
+
+    async function fetchSignIn(): Promise<void> {
+        try {
+            setIsLoading(true);
+            if (!username || !password) {
+                throw new Error("Username and password are required");
+            }
+
+            const action = await dispatch(
+                signIn({
+                    username,
+                    password,
+                })
+            );
+
+            if (signIn.fulfilled.match(action)) {
+                navigate("/");
+            }
+        } catch (error: any) { 
+            console.error("Login error:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     return (
         <div className="w-full h-[100vh] p-8 box-border flex items-center gap-5">
@@ -26,13 +58,30 @@ export default function Authorization({}: Props) {
                         <img className="mt-16" src={logoImg} width={64} height={64} alt="logo" />
                         <h2 className="text-2xl font-medium">Welcome back!</h2>
                         <p className="text-[#00000060]">Enter email & password to continue</p>
-                        <form className="w-full mt-6 flex flex-col items-center gap-2">
-                            <input className={styles.username} onInput={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)} type="email" placeholder="Enter your email address" required/>
+                        <form 
+                            className="w-full mt-6 flex flex-col items-center gap-2"
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                fetchSignIn();
+                            }}
+                        >
+                            <input className={styles.username} onInput={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)} type="text" placeholder="Enter your username" required/>
                             <input className={styles.password} onInput={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)} type="password" placeholder="Enter your password" required/>
-                            <button type='submit' disabled={!isDisabled} className={classnames('mt-8 w-full bg-black py-3 box-border text-center rounded-xl text-white font-medium cursor-pointer',{
-                                'opacity-20': !isDisabled,
-                                'opacity-100': isDisabled,
-                            })}>Sign in</button>
+                            {error && (
+                                <div className="text-red-500 text-sm mt-2 border border-red-500 rounded-lg w-full p-2 box-border">
+                                    {error}
+                                </div>
+                            )}
+                            <button 
+                                type='submit' 
+                                disabled={!isDisabled || isLoading} 
+                                className={classnames('mt-8 w-full bg-black py-3 box-border text-center rounded-xl text-white font-medium cursor-pointer',{
+                                    'opacity-20': !isDisabled,
+                                    'opacity-100': isDisabled,
+                                })}
+                            >
+                                {isLoading ? "Loading..." : "Sign in"}
+                            </button>
                         </form>
                         <div className='w-full mt-5 flex items-center justify-center gap-3'>
                             <div className='w-[25%] h-[1px] bg-[#eaeaea]'></div>
