@@ -22,7 +22,7 @@ export default function Authorization({}: Props) {
     const   [username, setUsername] = useState<string>(''), 
             [password, setPassword] = useState<string>(''),
             [isLoginPage, setIsLoginPage] = useState<boolean>(true),
-            [isLoading, setIsLoading] = useState(false);
+            [isLoading, setIsLoading] = useState<boolean>(false);
 
     const isDisabled = Boolean(username && password);
 

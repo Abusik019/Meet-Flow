@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import { AuthResponse, AuthState, LoginData } from "../../types";
+import { AuthResponse, AuthState, LoginData, RegData } from "../../types";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -31,6 +31,41 @@ export const signIn = createAsyncThunk<AuthResponse, LoginData, { rejectValue: s
         return rejectWithValue(
             axios.isAxiosError(error) 
                 ? error.response?.data?.message || 'Login failed'
+                : 'Unknown error'
+        );
+    }
+});
+
+export const signUp = createAsyncThunk<AuthResponse, RegData, { rejectValue: string }>("auth/signIn", async (data: RegData, { rejectWithValue }) => {
+    const formData = new FormData();
+
+    formData.append("username", data.username);
+    formData.append("firstName", data.firstName);
+    formData.append("lastName", data.lastName);
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+
+    if(data.image){
+        formData.append("image", data.image);
+    }
+
+    try {
+        const response = await axios.post<AuthResponse>(`${API_URL}/api/auth/register`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
+
+        if (response.status !== 201) {
+            return rejectWithValue("Registration failed");
+        }
+
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(
+            axios.isAxiosError(error) 
+                ? error.response?.data?.message || 'Registration failed'
                 : 'Unknown error'
         );
     }

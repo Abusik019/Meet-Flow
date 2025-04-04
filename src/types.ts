@@ -13,3 +13,12 @@ export interface AuthState {
     loading: boolean;
     error: string | null;
 }
+
+export interface RegData {
+    username: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    image?: File;
+}

@@ -5,18 +5,18 @@ import ImgCrop from "antd-img-crop";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 type Props = {
-    setAvatar: (value: object) => void;
+    setImage: (value: File | null) => void; 
 };
 
-const Uploader: React.FC<Props> = ({ setAvatar }: Props) => {
+const Uploader: React.FC<Props> = ({ setImage }: Props) => {
     const [fileList, setFileList] = useState<UploadFile[]>([]);
 
     const onChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
         setFileList(newFileList);
-        if (newFileList.length > 0) {
-            setAvatar(newFileList[0].originFileObj || {});
+        if (newFileList.length > 0 && newFileList[0].originFileObj) {
+            setImage(newFileList[0].originFileObj as File);
         } else {
-            setAvatar({});
+            setImage(null);
         }
     };
 

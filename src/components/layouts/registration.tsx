@@ -3,24 +3,59 @@ import { Link } from "react-router-dom";
 import { useState } from 'react';
 import classnames from 'classnames';
 import Uploader from '../common/uploader';
+import { RootState, useAppDispatch } from '../../store/store';
+import { useSelector } from 'react-redux';
+import { signUp } from '../../store/slices/authSlice';
 
 import logoImg from "../../assets/images/logo.png";
 import yandexImg from "../../assets/icons/yandex.png";
 import googleImg from "../../assets/icons/google.svg";
 
 type Props = {
-    setIsLoginPage: (value: boolean) => void;
+    setIsLoginPage: (value: boolean) => void;                                                                                                                                                                                                                                                                                                                                                                                                                                           
 };
 
 export default function Registration({setIsLoginPage}: Props) {
-    const   [username, setUsername] = useState<string | null>(''),
-            [firstName, setFirstName] = useState<string | null>(''),
-            [lastName, setLastName] = useState<string | null>(''),
-            [email, setEmail] = useState<string | null>(''), 
-            [password, setPassword] = useState<string | null>(''),
-            [avatar, setAvatar] = useState<object | null>({});
+    const dispatch = useAppDispatch();
+    const error = useSelector((state: RootState) => state.authSlice.error);
+
+    const   [username, setUsername] = useState<string>(''),
+            [firstName, setFirstName] = useState<string >(''),
+            [lastName, setLastName] = useState<string>(''),
+            [email, setEmail] = useState<string >(''), 
+            [password, setPassword] = useState<string>(''),
+            [image, setImage] = useState<File | null>(null),
+            [isLoading, setIsLoading] = useState<boolean>(false);
 
     const isDisabled = Boolean(username && firstName && lastName && email && password);
+
+    async function fetchSignUp(): Promise<void> {
+        try {
+            setIsLoading(true);
+            if (!username || !password || !firstName || !lastName || !email) {
+                throw new Error("User data are required");
+            }
+
+            const action = await dispatch(
+                signUp({
+                    username,
+                    firstName,
+                    lastName,
+                    email,
+                    password,
+                    ...(image && { image })
+                })
+            );
+
+            if (signUp.fulfilled.match(action)) {
+                setIsLoginPage(true);
+            }
+        } catch (error: any) { 
+            console.error("Registration error:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     return (
         <div className="w-[50%] h-full border border-[#eaeaea] rounded-xl flex items-start justify-center px-8 py-5 box-border">
@@ -32,8 +67,14 @@ export default function Registration({setIsLoginPage}: Props) {
                     alt="logo"
                 />
                 <div>
-                    <form className="w-full mt-6 flex flex-col items-center gap-2">
-                        <Uploader setAvatar={setAvatar}/>
+                    <form 
+                        className="w-full mt-6 flex flex-col items-center gap-2"
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            fetchSignUp();
+                        }}
+                    >
+                        <Uploader setImage={setImage}/>
                         <input
                             className={styles.username}
                             onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -45,7 +86,7 @@ export default function Registration({setIsLoginPage}: Props) {
                         />
                         <div className='w-full flex items-center gap-1'>
                             <input
-                                className="w-[50%] rounded-lg border border-[#eaeaea] shadow-xl py-3 px-2 box-border outline-none appearance-none"
+                                className="w-[50%] rounded-lg border border-[#eaeaea] shadow-xl py-3 px-2 box-border outline-none appearance-none text-center"
                                 onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
                                     setFirstName(e.target.value)
                                 }
@@ -54,7 +95,7 @@ export default function Registration({setIsLoginPage}: Props) {
                                 required
                             />
                             <input
-                                className="w-[50%] rounded-lg border border-[#eaeaea] shadow-xl py-3 px-2 box-border outline-none appearance-none"
+                                className="w-[50%] rounded-lg border border-[#eaeaea] shadow-xl py-3 px-2 box-border outline-none appearance-none text-center"
                                 onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
                                     setLastName(e.target.value)
                                 }
@@ -81,6 +122,11 @@ export default function Registration({setIsLoginPage}: Props) {
                             placeholder="Enter your password"
                             required
                         />
+                        {error && (
+                            <div className="text-red-500 text-sm mt-2 border border-red-500 rounded-lg w-full p-2 box-border">
+                                {error}
+                            </div>
+                        )}
                         <button
                             type="submit"
                             disabled={!isDisabled}
@@ -92,7 +138,7 @@ export default function Registration({setIsLoginPage}: Props) {
                                 }
                             )}
                         >
-                            Sign up
+                             {isLoading ? "Loading..." : "Sign up"}
                         </button>
                     </form>
                     <div className="w-full mt-5 flex items-center justify-center gap-3">
