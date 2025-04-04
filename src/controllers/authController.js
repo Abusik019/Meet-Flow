@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const crypto = require("crypto");
 const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const {
     JWT_SECRET
 } = require('../config');
@@ -19,7 +21,23 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-const storage = multer.memoryStorage();
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadPath = path.join(__dirname, '../uploads');
+
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+        }
+
+        cb(null, uploadPath);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+    }
+});
+
 const upload = multer({ storage });
 
 exports.register = async (req, res) => {
@@ -30,7 +48,11 @@ exports.register = async (req, res) => {
 
         try {
             const { username, firstName, lastName, email, password } = req.body;
-            const image = req.file ? req.file.buffer.toString('base64') : 'http://localhost:9090/cache/images/default.logo.svg';
+            let image = 'http://localhost:9090/cache/images/default.logo.svg';
+
+            if (req.file) {
+                image = `http://localhost:9090/uploads/${req.file.filename}`;
+            }
 
             const verificationToken = crypto.randomBytes(32).toString('hex');
 
@@ -60,6 +82,7 @@ exports.register = async (req, res) => {
         }
     });
 };
+
 
 exports.verifyEmail = async (req, res) => {
     try {
