@@ -22,3 +22,15 @@ export interface RegData {
     password: string;
     image?: File;
 }
+
+export interface IconProps {
+    className?: string;
+    strokeWidth?: string;
+    fillColor?: string
+}
+
+export type NavItem = {
+    name: string;
+    href: string;
+    icon: React.ComponentType<IconProps>;
+};
