@@ -26,6 +26,11 @@ const navItems: NavItem[] = [
         href: "/friends", 
         icon: UsersIcon
     },
+    {
+        name: "Canvas", 
+        href: "/canvas", 
+        icon: UsersIcon
+    },
 ]
 
 export default function NavPanel({}: Props) {

@@ -27,6 +27,7 @@ function App() {
             <div className="">
                 <Routes>
                     <Route path="/auth" element={<Authorization />} />
+                    <Route path="/canvas" element={<Authorization />} />
                 </Routes>
             </div>
 
