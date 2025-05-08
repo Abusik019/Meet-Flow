@@ -76,22 +76,24 @@ export const authSlice = createSlice({
     initialState,
     reducers: {},
     extraReducers(builder) {
-         // Вход
-        builder.addCase(signIn.pending, (state) => {
+        builder
+        
+        // Вход
+        .addCase(signIn.pending, (state) => {
             state.loading = true;
-        });
+        })
 
-        builder.addCase(signIn.fulfilled, (state, action) => {
+        .addCase(signIn.fulfilled, (state, action) => {
             state.accessToken = action.payload.token;
 
             state.loading = false;
             state.error = null;
-        });
+        })
 
-        builder.addCase(signIn.rejected, (state, action) => {
+        .addCase(signIn.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload || 'Login failed';
-        });
+        })
     },
 });
 

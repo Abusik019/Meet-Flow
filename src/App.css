@@ -3,3 +3,11 @@
     margin: 0 auto;
     text-align: center;
 }
+
+.tl-watermark_SEE-LICENSE {
+    display: none !important;
+}
+
+.tlui-navigation-panel {
+    display: none !important;
+}

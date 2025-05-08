@@ -5,6 +5,8 @@ import NavPanel from "./components/layouts/navPanel";
 import { useSelector } from "react-redux";
 import { useLayoutEffect, useState } from "react";
 import { RootState } from "./store/store";
+import ChoosenCanvas from "./pages/Canvas/index";
+import Canvas from "./pages/Canvas/canvas";
 
 function App() {
     const [isAuth, setIsAuth] = useState<boolean>(false);
@@ -21,13 +23,15 @@ function App() {
     if (!isAuth) return <Authorization />;
 
     return (
-        <div className="w-full h-[100vh] max-h-fit relative flex items-center gap-20 p-4 box-border">
+        <div className="w-full h-[100vh] max-h-fit relative flex items-center gap-4 p-4 box-border">
             {/* size = (default = sm), md, lg, xl */}
             <NavPanel /> 
-            <div className="">
+            <div className="w-full min-h-full">
                 <Routes>
                     <Route path="/auth" element={<Authorization />} />
-                    <Route path="/canvas" element={<Authorization />} />
+                    <Route path="/canvas" element={<ChoosenCanvas />} />
+                    <Route path="/canvas/new" element={<Canvas />} />
+                    <Route path="/canvas/past" element={<Canvas />} />
                 </Routes>
             </div>
 

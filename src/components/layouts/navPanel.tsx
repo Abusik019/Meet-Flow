@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import classNames from "classnames";
 import BagIcon from "../../assets/CompanyIcon";
 import ResizeIcon from "../../assets/ResizeIcon";
+import CanvasIcon from "../../assets/CanvasIcon";
 
 type Props = {};
 
@@ -29,7 +30,7 @@ const navItems: NavItem[] = [
     {
         name: "Canvas", 
         href: "/canvas", 
-        icon: UsersIcon
+        icon: CanvasIcon 
     },
 ]
 
@@ -49,9 +50,9 @@ export default function NavPanel({}: Props) {
     }
 
     useEffect(() => {
-        const page = location.pathname.substring(1); 
-        if (['chat', 'company', 'friends'].includes(page)) {
-            setActivePage(page);
+        const rootSegment  = location.pathname.split('/')[1]; 
+        if (['chat', 'company', 'friends', 'canvas'].includes(rootSegment)) {
+            setActivePage(rootSegment);
         } else {
             setActivePage('');
         }
