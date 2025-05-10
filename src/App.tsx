@@ -2,21 +2,23 @@ import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import Authorization from "./pages/Auth";
 import NavPanel from "./components/layouts/navPanel";
-import { useSelector } from "react-redux";
 import { useLayoutEffect, useState } from "react";
-import { RootState } from "./store/store";
+import { useAppDispatch, useAppSelector } from "./store/store";
 import ChoosenCanvas from "./pages/Canvas/index";
 import Canvas from "./pages/Canvas/canvas";
+import { getMyInfo } from "./store/slices/authSlice";
 
 function App() {
     const [isAuth, setIsAuth] = useState<boolean>(false);
-    const token = useSelector((state: RootState) => state.authSlice.accessToken);
+    const dispatch = useAppDispatch();
+    const token = useAppSelector((state) => state.authSlice.accessToken);
 
     useLayoutEffect(() => {
         if(token){
-            setIsAuth(true)
+            setIsAuth(true);
+            dispatch(getMyInfo());
         } else{
-            setIsAuth(false)
+            setIsAuth(false);
         }
     }, [token]);
 

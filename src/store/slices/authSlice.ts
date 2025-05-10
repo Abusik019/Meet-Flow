@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import { AuthResponse, AuthState, LoginData, RegData } from "../../types";
+import { AuthMyInfo, AuthResponse, AuthState, LoginData, RegData } from "../../types";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -36,7 +36,7 @@ export const signIn = createAsyncThunk<AuthResponse, LoginData, { rejectValue: s
     }
 });
 
-export const signUp = createAsyncThunk<AuthResponse, RegData, { rejectValue: string }>("auth/signIn", async (data: RegData, { rejectWithValue }) => {
+export const signUp = createAsyncThunk<AuthResponse, RegData, { rejectValue: string }>("auth/signUp", async (data: RegData, { rejectWithValue }) => {
     const formData = new FormData();
 
     formData.append("username", data.username);
@@ -71,6 +71,30 @@ export const signUp = createAsyncThunk<AuthResponse, RegData, { rejectValue: str
     }
 });
 
+export const getMyInfo = createAsyncThunk<AuthMyInfo, void, { rejectValue: string }>("auth/getMyInfo", async (_, { rejectWithValue }) => {
+    const token = localStorage.getItem("accessToken");
+
+    try {
+        const response = await axios.get(`${API_URL}/api/auth/get-my-info`, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            }
+        });
+
+        if (response.status !== 200) {
+            return rejectWithValue("Error obtaining data");
+        }
+
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(
+            axios.isAxiosError(error) 
+                ? error.response?.data?.message || 'Error obtaining data'
+                : 'Unknown error'
+        );
+    }
+});
+
 export const authSlice = createSlice({
     name: "auth",
     initialState,
@@ -91,6 +115,22 @@ export const authSlice = createSlice({
         })
 
         .addCase(signIn.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload || 'Login failed';
+        })
+
+        // Получение моих данных
+        .addCase(getMyInfo.pending, (state) => {
+            state.loading = true;
+        })
+
+        .addCase(getMyInfo.fulfilled, (state, action) => {
+            state.userInfo = action.payload;
+            state.loading = false;
+            state.error = null;
+        })
+
+        .addCase(getMyInfo.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload || 'Login failed';
         })

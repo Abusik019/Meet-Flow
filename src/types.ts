@@ -1,3 +1,5 @@
+import { StoreSnapshot, TLRecord } from "tldraw";
+
 export interface LoginData {
     username: string;
     password: string;
@@ -8,7 +10,7 @@ export interface AuthResponse {
 }
 
 export interface AuthState {
-    userInfo: Record<string, unknown>;
+    userInfo: AuthMyInfo | {};
     accessToken: string | null;
     loading: boolean;
     error: string | null;
@@ -34,3 +36,30 @@ export type NavItem = {
     href: string;
     icon: React.ComponentType<IconProps>;
 };
+
+export interface ISnapshotState{
+    snapshotID: string;
+    loading: boolean;
+    error: string | null;
+}
+
+export type SnapshotPayload = {
+	snapshot: StoreSnapshot<TLRecord>;
+	authorId: string;
+}
+
+export type SnapshotResponse = {
+    message: string;
+    snapshotId: string; 
+    createdAt: Date; 
+};
+
+export type AuthMyInfo = {
+    id: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    image?: string;
+    createdAt: string;
+}
