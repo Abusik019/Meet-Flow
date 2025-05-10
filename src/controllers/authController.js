@@ -112,34 +112,39 @@ exports.verifyEmail = async (req, res) => {
 
 exports.login = async (req, res) => {
     try {
-        const {
-            username,
-            password
-        } = req.body;
-        const user = await User.findOne({
-            username
-        });
+        const { username, password } = req.body;
+        const user = await User.findOne({ username });
+
         if (!user || !(await user.comparePassword(password))) {
-            return res.status(400).json({
-                message: 'Invalid credentials'
-            });
+            return res.status(400).json({ message: 'Invalid credentials' });
         }
+
         if (!user.isVerified) {
-            return res.status(400).json({
-                message: 'Email not verified'
-            });
+            return res.status(400).json({ message: 'Email not verified' });
         }
-        const token = jwt.sign({
-            id: user._id
-        }, JWT_SECRET, {
-            expiresIn: '1h',
-        });
+
+        const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' });
+
+        res.json({ token });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+};
+
+exports.getUserData = async (req, res) => {
+    try {
+        const user = req.user;
+
         res.json({
-            token
+            id: user._id,
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            image: user.image,
+            createdAt: user.createdAt,
         });
     } catch (err) {
-        res.status(400).json({
-            message: err.message
-        });
+        res.status(400).json({ message: err.message });
     }
 };

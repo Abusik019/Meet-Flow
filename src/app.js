@@ -3,6 +3,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const { DB_URI } = require('./config');
 const authRoutes = require('./routes/authRoutes');
+const snapshotRoutes = require('./routes/snapshotRoutes');
 const path = require('path');
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(express.json());
 
 // Маршруты
 app.use('/api/auth', authRoutes);
+app.use('/api/snapsot', snapshotRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Статические файлы
