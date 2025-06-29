@@ -5,6 +5,9 @@ const { DB_URI } = require('./config');
 const authRoutes = require('./routes/authRoutes');
 const snapshotRoutes = require('./routes/snapshotRoutes');
 const path = require('path');
+const session = require('express-session');
+const passport = require('./config/passport');
+const { GOOGLE_CLIENT_SECRET } = require('./config');
 
 const app = express();
 
@@ -34,6 +37,16 @@ app.use(
         index: false,
     })
 );
+
+/* OAuth Middleware */
+app.use(session({
+    secret: GOOGLE_CLIENT_SECRET, 
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false } // secure: true только для https
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Подключение к MongoDB
 mongoose

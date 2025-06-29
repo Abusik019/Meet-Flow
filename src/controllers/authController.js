@@ -5,13 +5,8 @@ const crypto = require("crypto");
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const {
-    JWT_SECRET
-} = require('../config');
-const {
-    EMAIL_USER,
-    EMAIL_PASS
-} = require('../config');
+const axios = require('axios');
+const { JWT_SECRET, EMAIL_USER, EMAIL_PASS, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } = require('../config');
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -146,5 +141,57 @@ exports.getUserData = async (req, res) => {
         });
     } catch (err) {
         res.status(400).json({ message: err.message });
+    }
+};
+
+exports.googleOAuthCallback = async (req, res) => {
+    const { code } = req.body;
+    if (!code) return res.status(400).json({ error: 'No code provided' });
+
+    try {
+        const tokenResp = await axios.post('https://oauth2.googleapis.com/token', {
+            code,
+            client_id: GOOGLE_CLIENT_ID,
+            client_secret: GOOGLE_CLIENT_SECRET,
+            redirect_uri: "postmessage",
+            grant_type: 'authorization_code',
+        });
+        const { access_token } = tokenResp.data;
+
+        const userInfoResp = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
+            headers: { Authorization: `Bearer ${access_token}` }
+        });
+        const { email, name, picture } = userInfoResp.data;
+
+        let user = await User.findOne({ email });
+        if (!user) {
+            let firstName = '';
+            let lastName = '';
+            if (name) {
+                const parts = name.split(' ');
+                firstName = parts[0] || '';
+                lastName = parts.slice(1).join(' ') || '';
+            }
+            const username = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').slice(0, 20);
+            const password = crypto.randomBytes(12).toString('hex');
+
+            user = await User.create({
+                email,
+                username,
+                firstName,
+                lastName,
+                password,
+                image: picture,
+                isVerified: true,
+                googleId: userInfoResp.data.id
+            });
+        }
+
+        const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' });
+
+        res.json({ token });
+    } catch (err) {
+        console.error(err?.response?.data || err);
+        res.status(500).json({ error: 'Google authentication failed' });
     }
 };

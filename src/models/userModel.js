@@ -129,6 +129,10 @@ const UserSchema = new mongoose.Schema({
     verificationToken: {
         type: String,
     },
+    googleId: {
+        type: String,
+        allowNull: true, 
+    },
 });
 
 UserSchema.pre('save', async function (next) {
