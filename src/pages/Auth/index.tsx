@@ -6,11 +6,11 @@ import { RootState, useAppDispatch } from '../../store/store';
 import { useSelector } from 'react-redux';
 import classnames from 'classnames';
 import Registration from '../../components/layouts/registration';
+import { GoogleLoginBtn } from '../../components/common/googleLoginBtn';
 
 import meetImg from "../../assets/images/login.jpg";
 import logoImg from "../../assets/images/logo.png";
 import yandexImg from "../../assets/icons/yandex.png";
-import googleImg from "../../assets/icons/google.svg";
 
 type Props = {};
 
@@ -89,10 +89,7 @@ export default function Authorization({}: Props) {
                             <div className='w-[25%] h-[1px] bg-[#eaeaea]'></div>
                         </div>
                         <div className='w-full mt-5 flex items-center justify-center gap-3'>
-                            <Link to="#" className='w-[50%] py-2 box-border border border-[#eaeaea] flex items-center justify-center gap-2 rounded-lg transition-all hover:bg-[#00000010]'>
-                                <img src={googleImg} width={24} height={24} alt="google" />
-                                <span className='font-medium'>Google</span>
-                            </Link>
+                            <GoogleLoginBtn />
                             <Link to="#" className='w-[50%] py-2 box-border border border-[#eaeaea] flex items-center justify-center gap-2 rounded-lg transition-all hover:bg-[#00000010]'>
                                 <img src={yandexImg} width={24} height={24}  alt="yandex" />
                                 <span className='font-medium'>Yandex</span>

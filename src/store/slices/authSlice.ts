@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const initialState: AuthState = {
     userInfo: {},
-    accessToken: localStorage.getItem("accessToken") || null, 
+    token: localStorage.getItem("token") || null, 
     loading: false,
     error: null,
 };
@@ -25,7 +25,7 @@ export const signIn = createAsyncThunk<AuthResponse, LoginData, { rejectValue: s
         }
 
         const { token } = response.data;
-        localStorage.setItem("accessToken", token);
+        localStorage.setItem("token", token);
         return response.data;
     } catch (error) {
         return rejectWithValue(
@@ -72,7 +72,7 @@ export const signUp = createAsyncThunk<AuthResponse, RegData, { rejectValue: str
 });
 
 export const getMyInfo = createAsyncThunk<AuthMyInfo, void, { rejectValue: string }>("auth/getMyInfo", async (_, { rejectWithValue }) => {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("token");
 
     try {
         const response = await axios.get(`${API_URL}/api/auth/get-my-info`, {
@@ -108,7 +108,7 @@ export const authSlice = createSlice({
         })
 
         .addCase(signIn.fulfilled, (state, action) => {
-            state.accessToken = action.payload.token;
+            state.token = action.payload.token;
 
             state.loading = false;
             state.error = null;

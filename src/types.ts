@@ -10,8 +10,8 @@ export interface AuthResponse {
 }
 
 export interface AuthState {
-    userInfo: AuthMyInfo | {};
-    accessToken: string | null;
+    userInfo: AuthMyInfo | object;
+    token: string | null;
     loading: boolean;
     error: string | null;
 }
